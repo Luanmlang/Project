@@ -29,7 +29,7 @@ def scrape_nike(search_term):
     #grabs the raw html
     html = BeautifulSoup(driver.page_source, "html.parser")
     
-    #selects the first 5 items from the search results
+    #gathers items from the search results up to 5 of them
     products = html.select("div.product-card__body", limit=5)
     
     #stores results in a list
@@ -47,14 +47,24 @@ def scrape_nike(search_term):
 
 def scrape_bestbuy(search_term):
     print(f"\n🔍 Searching Best Buy for '{search_term}'...")
+    
+    #formatting url
     url = f"https://www.bestbuy.com/site/searchpage.jsp?st={search_term.replace(' ', '+')}"
     driver = driver()
+    
+    #navigate to the url
     driver.get(url)
+    
+    #waiting for page to load
     time.sleep(5)
 
+    #grabs the raw html
     html = BeautifulSoup(driver.page_source, "html.parser")
+    
+    #gathers items from the search results up to 5 of them
     products = html.find_all("li", {"class": "sku-item"}, limit=5)
 
+    #stores results in a list
     results = []
     for product in products:
         name = product.find("h4")
@@ -66,3 +76,4 @@ def scrape_bestbuy(search_term):
 
     driver.quit()
     return results
+
