@@ -77,3 +77,12 @@ def scrape_bestbuy(search_term):
     driver.quit()
     return results
 
+def display_results(results):
+    print("\nThese are the products I found sorted from lowest to highest price :)")
+    for item in results:
+        print(f"- {item['name']} | {item['store']} | {item['price']}")
+        
+        
+def store_results(results, dict, search_term):
+    print("\n Stored results in database")
+    dict[search_term] = results
