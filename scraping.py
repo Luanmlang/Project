@@ -86,40 +86,42 @@ def display_results(results):
         
         
 def store_results(results, dict, search_term):
-    print("\n Stored results in database")
+    print("\n Stored results")
     dict[search_term] = results
     
 def convert_to_float(product):
     return float(product["price"].replace("$", "").replace(",", "").strip())
     
 def sort(products):
-    stack = [(0, len(products) - 1)]  # Stack stores tuples of (low, high)
+    stack = [(0, len(products) - 1)]
     while stack:
         low, high = stack.pop()
         
-        # If there's more than one element in the range
+
         if low < high:
-            pivot_index = partition(products, low, high)
-            stack.append((low, pivot_index - 1))  # Left side
-            stack.append((pivot_index + 1, high))  # Right side
+            pivot = partition(products, low, high)
+            stack.append((low, pivot - 1))
+            stack.append((pivot + 1, high))
 
     return products
 
 def partition(products, low, high):
-    pivot = convert_to_float(products[high])  # Choosing the last element as pivot
+    pivot = convert_to_float(products[high])
     i = low - 1
     
     for j in range(low, high):
         if convert_to_float(products[j]) <= pivot:
             i += 1
-            products[i], products[j] = products[j], products[i]  # Swap elements
+            products[i], products[j] = products[j], products[i] 
     
-    products[i + 1], products[high] = products[high], products[i + 1]  # Swap pivot to the correct position
+    products[i + 1], products[high] = products[high], products[i + 1]
     return i + 1
 
 
 def main():
     print("//// Price Comparison Tool Proof of Concept ////\n")
+    
+    
     
     search = input("Enter the product name you want to compare: ").strip()
     
@@ -133,10 +135,59 @@ def main():
         print("No products were found for Nike")
     if(not bestbuy_products):
         print("No products were found for best buy")
-        
+    
     combined = nike_products + bestbuy_products
-    sorted = sort(combined)
-    display_results(sorted)
+    
+    sorted_products = sort(combined)
+    
+    display_results(sorted_products)
+    
+    if(nike_products):
+        store_results(nike_products,nike, search)
+    if(bestbuy_products):
+        store_results(bestbuy_products, bestbuy, search)
+        
+    c = 'x'
+    while(not c == 'e'):
+        c = input("Please input a if you want to compare a product, l if you want to lookup a product, and e if you want to exit:  ")
+        if(c == 'a'):
+            search = input("Enter the product name you want to compare: ").strip()
+            nike_products = scrape_nike(search)
+            bestbuy_products = scrape_bestbuy(search)
+    
+            if(not nike_products):
+                print("No products were found for Nike")
+            if(not bestbuy_products):
+               print("No products were found for best buy")
+
+            combined = nike_products + bestbuy_products
+    
+            sorted_products = sort(combined)
+    
+            display_results(sorted_products)
+            
+            if(nike_products):
+                store_results(nike_products,nike, search)
+            if(bestbuy_products):
+                store_results(bestbuy_products, bestbuy, search)
+                
+        if(c == 'l'):
+            name = input("Please enter the name of the product you are trying to retrieve: ")
+            nike_results = nike.get(name)
+            if(nike_results):
+                for item in nike_results:
+                    print(f"- {item['name']} | {item['store']} | {item['price']}")
+            else:
+                print("No item matching that name was found from nike \n")
+            bestbuy_results = bestbuy.get(name)
+            if(bestbuy_results):
+                for item in bestbuy_results:
+                    print(f"- {item['name']} | {item['store']} | {item['price']}")
+            else:
+                print("No item matching that name was found from bestbuy\n")
+
+        
+    
     
 main()
     
